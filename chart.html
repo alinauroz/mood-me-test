@@ -13,6 +13,13 @@
 
             window.onload = () => {
 
+                /**
+                 * creates a input[type=button]
+                 * @param   {String}       value
+                 * @param   {function}     onClick  
+                 * @returns {HTMLElement}
+                */
+
                 function Button ({value, onClick}) {
                     let button = document.createElement('input');
                     button.type = 'button';
