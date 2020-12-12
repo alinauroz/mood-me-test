@@ -13,8 +13,26 @@
 
             window.onload = () => {
 
+                function Button ({value, onClick}) {
+                    let button = document.createElement('input');
+                    button.type = 'button';
+                    button.value = value;
+                    button.onclick = onClick;
+                    return button;
+                }
+
+                /**
+                 * renders an array of HTML elements in container
+                 * @param   {Array.<HTMLElement>}   elements
+                 * @param   {HTMLElement}           container
+                */
+
+                function render (elements, container) {
+                    elements.forEach(el => container.append( el ));
+                }
+
                 let users = getUsers(EMOTIONS.data);
-                console.log(users[0]);
+                const usersToRender = new Set(users);
 
             }
 
