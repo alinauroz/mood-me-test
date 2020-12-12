@@ -3,6 +3,22 @@
         <title>Emotion Charts</title>
         <script type="text/javascript" src="https://unpkg.com/lodash@4.17.20/lodash.min.js"></script>
         <script type="text/javascript"src="./emotions.js"></script>
+        <script>
+
+            function getUsers (data) {
+                const users = new Set();
+                data.forEach(entry => users.add(entry.participantId));
+                return Array.from(users);
+            }
+
+            window.onload = () => {
+
+                let users = getUsers(EMOTIONS.data);
+                console.log(users[0]);
+
+            }
+
+        </script>
     </head>
     <body>
 
