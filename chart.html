@@ -29,6 +29,32 @@
                 }
 
                 /**
+                 * returns a input[type=checkbox] wrapped in a container
+                 * @param   {String}    label
+                 * @param   {String}    id
+                 * @param   {function}  onChecked
+                 * @param   {function}  onUnchecked
+                 * @returns {HTMLElement}
+                */
+
+                function CheckBox ({label, id, onChecked = null, onUnchecked = null}) {
+                    let container = document.createElement('span')
+                    let callback = document.createElement('input');
+                    let _label = document.createElement('label');
+
+                    callback.type = 'checkbox';
+                    callback.id = id;
+                    callback.onclick = (e) => e.target.checked ? onChecked(e) : onUnchecked(e);
+
+                    _label.innerHTML = label;
+                    _label.setAttribute('for', id);
+                    container.appendChild(callback);
+                    container.appendChild(_label);
+
+                    return container;
+                }
+
+                /**
                  * renders an array of HTML elements in container
                  * @param   {Array.<HTMLElement>}   elements
                  * @param   {HTMLElement}           container
@@ -40,6 +66,11 @@
 
                 let users = getUsers(EMOTIONS.data);
                 const usersToRender = new Set(users);
+
+                render(
+                    [CheckBox({label: 'Hello', id: 'aone', onChecked: () => alert('checked'), onUnchecked: () => alert('unchecked')})],
+                    document.body
+                )
 
             }
 
