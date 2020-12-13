@@ -2,6 +2,7 @@
     <head>
         <title>Emotion Charts</title>
         <script type="text/javascript" src="https://unpkg.com/lodash@4.17.20/lodash.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
         <script type="text/javascript"src="./emotions.js"></script>
         <script>
 
@@ -37,7 +38,7 @@
                  * @returns {HTMLElement}
                 */
 
-                function CheckBox ({label, id, onChecked = null, onUnchecked = null}) {
+                function CheckBox ({label, id, checked = false, onChecked = null, onUnchecked = null}) {
                     let container = document.createElement('span')
                     let callback = document.createElement('input');
                     let _label = document.createElement('label');
@@ -45,6 +46,7 @@
                     callback.type = 'checkbox';
                     callback.id = id;
                     callback.onclick = (e) => e.target.checked ? onChecked(e) : onUnchecked(e);
+                    callback.checked = checked;
 
                     _label.innerHTML = label;
                     _label.setAttribute('for', id);
@@ -64,19 +66,68 @@
                     elements.forEach(el => container.append( el ));
                 }
 
+                /**
+                 * renders a graph using canvas JS
+                 * @param   {HTMLElement}       container   -   the container of char
+                 * @param   {Array.<Object>}    users       -   the emotions data array
+                */
+
+                function renderChart (container, users) {
+                    let i = 0;
+                    const data = [];
+                    for (let user of users) {
+                        let userData = _.filter(EMOTIONS.data, {participantId: user });
+
+                        let dataPoints = userData.map(entry => ({x: new Date(entry.timestamp).getMinutes() * 60 + new Date(entry.timestamp).getSeconds(), y: entry.attention}))
+                        console.log(dataPoints)
+                        data.push({type: 'line', dataPoints});
+                    }
+
+                    let chart = new CanvasJS.Chart(container, {
+                        title: {
+                            text: 'Emotions Graph'
+                        },
+                        theme: 'light',
+                        data
+                    });
+
+                    chart.render();
+
+                }
+
                 let users = getUsers(EMOTIONS.data);
                 const usersToRender = new Set(users);
 
+                const checkBoxes = users.map(user => CheckBox({
+                    label: user,
+                    id: user,
+                    checked: true,
+                    onChecked: () => updateUsersToRender(user, usersToRender.add.bind(usersToRender)),
+                    onUnchecked: () => updateUsersToRender(user, usersToRender.delete.bind(usersToRender))
+                }))
+
+                function updateUsersToRender(value, func) {
+                    func(value);
+                    renderChart('chart-container', usersToRender);
+                }
+                
                 render(
-                    [CheckBox({label: 'Hello', id: 'aone', onChecked: () => alert('checked'), onUnchecked: () => alert('unchecked')})],
-                    document.body
-                )
+                    checkBoxes,
+                    document.getElementById('users-cb')
+                );
+                //renderChart('chart-container', usersToRender);
 
             }
 
         </script>
+        <style>
+            #chart-container {
+                margin-top: 100px;
+            }
+        </style>
     </head>
     <body>
-
+        <div id = 'users-cb'></div>
+        <div id = 'chart-container'></div>
     </body>
 </html>
