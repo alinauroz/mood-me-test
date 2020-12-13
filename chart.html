@@ -66,20 +66,77 @@
                     elements.forEach(el => container.append( el ));
                 }
 
+                function addKey (data, key, fn, targetKey) {
+                    data.forEach(entry => entry[key] = fn(entry[targetKey]));
+                }
+
+                function scale ({data, pointIndex, key, targetKey, stepSize}) {
+
+                    let nextPointIndex = pointIndex + 1;
+                    let prevPointIndex = pointIndex - 1;
+                    let merged = 0;
+
+                    if (prevPointIndex >= 0 && Math.abs(data[pointIndex][key] - data[prevPointIndex][key]) < stepSize/2) {
+                        data[prevPointIndex][targetKey] = (data[prevPointIndex][targetKey] + data[pointIndex][targetKey])/2;
+                        data.splice(pointIndex, 1);
+                        nextPointIndex --;
+                        pointIndex > 0 && pointIndex --;
+                        merged ++;
+                    }
+
+                    if (nextPointIndex < data.length && Math.abs(data[pointIndex][key] - data[nextPointIndex][key]) < stepSize/2) {
+                        data[pointIndex][targetKey] = (data[nextPointIndex][targetKey] + data[pointIndex][targetKey])/2;
+                        data.splice(nextPointIndex, 1);
+                        merged ++;
+                    }
+
+                    return merged;
+                }
+
+                window.scale = scale;
+                window.addKey = addKey;
+
                 /**
                  * renders a graph using canvas JS
                  * @param   {HTMLElement}       container   -   the container of char
                  * @param   {Array.<Object>}    users       -   the emotions data array
+                 * @param   {function}          filter      -   a function applied to data before plotting chart
+                 * @param   {Object}            options     -   options for rendering graph
                 */
 
-                function renderChart (container, users) {
+                function renderChart (container, users, filter, options) {
                     let i = 0;
                     const data = [];
                     for (let user of users) {
                         let userData = _.filter(EMOTIONS.data, {participantId: user });
+                        addKey(userData, 'seconds', (ts) => new Date(ts).getMinutes() * 60 + new Date(ts).getSeconds(), 'timestamp');
+                        
+                        switch(filter) {
+                            case 'avergeAndScale' : {
+                                for (let i = 0; i < userData.length; i++) {
+                                    let noOfMerge = scale({
+                                        data: userData,
+                                        pointIndex: i,
+                                        key: 'seconds',
+                                        targetKey: 'attention',
+                                        stepSize: options.stepSize
+                                    })
+                                    i -= noOfMerge;
+                                }
+                                break;
+                            }
+                            case 'quantize' : {
+                                for (let i = 0; i < userData.length; i++) {
+                                    
+                                }
+                            }
+                        }
+                        
 
                         let dataPoints = userData.map(entry => ({x: new Date(entry.timestamp).getMinutes() * 60 + new Date(entry.timestamp).getSeconds(), y: entry.attention}))
-                        console.log(dataPoints)
+                        
+
+
                         data.push({type: 'line', dataPoints});
                     }
 
