@@ -121,13 +121,26 @@
 
         </script>
         <style>
+            body {
+                font-family: 'arial', sans-serif;
+            }
+
             #chart-container {
                 margin-top: 100px;
+            }
+            #users-cb h3 {
+                margin: 3px 0px 0px 0px;
+            }
+            #users-cb p {
+                margin: 0px 0px 5px 0px;
             }
         </style>
     </head>
     <body>
-        <div id = 'users-cb'></div>
+        <div id = 'users-cb'>
+            <h3>Participants</h3>
+            <p>Below is a list of unique users found in the data</p>
+        </div>
         <div id = 'chart-container'></div>
     </body>
 </html>
