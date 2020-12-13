@@ -126,17 +126,20 @@
                                 break;
                             }
                             case 'quantize' : {
-                                for (let i = 0; i < userData.length; i++) {
-                                    
+                                let startTime = userData[0].seconds;
+                                for (let i = 1; i < userData.length; i++) {
+                                    if ((userData[i].seconds - startTime) % options.stepSize !== 0) {
+                                        userData.splice(i, 1);
+                                        i--;
+                                    }
                                 }
+                            }
+                            case 'mean': {
+                                // mean filter code here
                             }
                         }
                         
-
-                        let dataPoints = userData.map(entry => ({x: new Date(entry.timestamp).getMinutes() * 60 + new Date(entry.timestamp).getSeconds(), y: entry.attention}))
-                        
-
-
+                        let dataPoints = userData.map(entry => ({x: new Date(entry.timestamp).getMinutes() * 60 + new Date(entry.timestamp).getSeconds(), y: entry.attention}));
                         data.push({type: 'line', dataPoints});
                     }
 
@@ -165,14 +168,14 @@
 
                 function updateUsersToRender(value, func) {
                     func(value);
-                    renderChart('chart-container', usersToRender);
+                    renderChart('chart-container', usersToRender, 'quantize', {stepSize: 4});
                 }
                 
                 render(
                     checkBoxes,
                     document.getElementById('users-cb')
                 );
-                //renderChart('chart-container', usersToRender);
+                renderChart('chart-container', usersToRender);
 
             }
 
