@@ -34,6 +34,14 @@
                     return button;
                 }
 
+                function TextInput ({placeholder, onChange, type="text"}) {
+                    let input=document.createElement('input');
+                    input.type=type;
+                    input.placeholder=placeholder;
+                    input.onkeyup=onChange;
+                    return input;
+                }
+
                 /**
                  * returns a input[type=checkbox] wrapped in a container
                  * @param   {String}    label
@@ -208,6 +216,12 @@
                     _renderChart();
                 }
 
+                function setStepSize(value) {
+                    console.log(value)
+                    options.stepSize = value || 0;
+                    _renderChart();
+                }
+
                 function _renderChart () {
                     renderChart('chart-container', usersToRender, filter, options);
                 }
@@ -215,7 +229,11 @@
                 const radioControls = [
                     RadioButton({label: 'Quantize', id: 'quantize', name: 'filter', onClick: () => setFilter('quantize')}),
                     RadioButton({label: 'AverageAndScale', name: 'filter', id: 'avgAndScale', onClick: () => setFilter('averageAndScale')}),
-                    RadioButton({label: 'No Filter', name: 'filter', id: 'no-filter', onClick: () => setFilter(null)}),
+                    RadioButton({label: 'No Filter', checked: true, name: 'filter', id: 'no-filter', onClick: () => setFilter(null)}),
+                ]
+
+                const graphOptions = [
+                    TextInput({placeholder: 'Step Size', type: 'number', onChange: (e) => setStepSize(e.target.value)})
                 ]
 
                 render(
@@ -224,7 +242,11 @@
                 );
                 render(
                     radioControls,
-                    document.getElementById('graph-controls')
+                    document.getElementById('filter-controls')
+                );
+                render(
+                    graphOptions,
+                    document.getElementById('graph-options')
                 );
                 renderChart('chart-container', usersToRender);
 
@@ -245,10 +267,11 @@
             #users-cb p {
                 margin: 0px 0px 5px 0px;
             }
-            #graph-controls {
+            .graph-controls {
                 margin-top: 10px;
+                margin-right: 50px;
             }
-            #graph-control-title {
+            .graph-control-title {
                 margin-right: 25px;
             }
         </style>
@@ -258,8 +281,13 @@
             <h3>Participants</h3>
             <p>Below is a list of unique users found in the data</p>
         </div>
-        <div id = 'graph-controls'>
-            <span id = 'graph-controls-title'>Graph Controls:</span>
+        <div>
+            <span class = 'graph-controls' id = 'filter-controls'>
+                <span class = 'graph-controls-title'>Graph Controls:</span>
+            </span>
+            <span class = 'graph-controls' id = 'graph-options'>
+                <span class = 'graph-controls-title'>Graph Options:</span>
+            </span>
         </div>
         <div id = 'chart-container'></div>
     </body>
