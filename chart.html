@@ -34,6 +34,14 @@
                     return button;
                 }
 
+                /**
+                 * creates a input
+                 * @param   {String}       placeholder
+                 * @param   {function}     onChange
+                 * @param   {String}       type
+                 * @returns {HTMLElement}
+                */
+
                 function TextInput ({placeholder, onChange, type="text"}) {
                     let input=document.createElement('input');
                     input.type=type;
@@ -74,6 +82,7 @@
                  * @param   {String}    label
                  * @param   {String}    id
                  * @param   {function}  onClick
+                 * @param   {bool}      checked
                  * @returns {HTMLElement}
                 */
 
@@ -106,9 +115,31 @@
                     elements.forEach(el => container.append( el ));
                 }
 
+                /**
+                 * adds a new key,value to objects in array
+                 * @param   {Array.<Object>}    data
+                 * @param   {String}            key
+                 * @param   {function}          fn
+                 * @param   {String}            targetKey
+                */
+
                 function addKey (data, key, fn, targetKey) {
                     data.forEach(entry => entry[key] = fn(entry[targetKey]));
                 }
+
+                /**
+                 * takes an average of values within current, previoud and next values for yAxis
+                 * only if their x-coordinate is within interval (-stepSize/2, stepSize/2). A new
+                 * point is created with the average value as yAxis and smallest xAxis value within
+                 * this interval.
+                 * 
+                 * @param   {Array.<Object>}    data
+                 * @param   {Number}            pointIndex
+                 * @param   {String}            targetKey
+                 * @param   {Number}            StepSize
+                 * 
+                 * @returns {Number}
+                */
 
                 function scale ({data, pointIndex, key, targetKey, stepSize}) {
 
@@ -221,6 +252,10 @@
                     options.stepSize = value || 0;
                     _renderChart();
                 }
+
+                /**
+                 * calls renderChart with parameters
+                */
 
                 function _renderChart () {
                     renderChart('chart-container', usersToRender, filter, options);
