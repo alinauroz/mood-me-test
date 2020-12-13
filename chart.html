@@ -6,6 +6,11 @@
         <script type="text/javascript"src="./emotions.js"></script>
         <script>
 
+            let filter;
+            const options = {
+                stepSize: 10,
+            };
+
             function getUsers (data) {
                 const users = new Set();
                 data.forEach(entry => users.add(entry.participantId));
@@ -40,17 +45,44 @@
 
                 function CheckBox ({label, id, checked = false, onChecked = null, onUnchecked = null}) {
                     let container = document.createElement('span')
-                    let callback = document.createElement('input');
+                    let checkbox = document.createElement('input');
                     let _label = document.createElement('label');
 
-                    callback.type = 'checkbox';
-                    callback.id = id;
-                    callback.onclick = (e) => e.target.checked ? onChecked(e) : onUnchecked(e);
-                    callback.checked = checked;
+                    checkbox.type = 'checkbox';
+                    checkbox.id = id;
+                    checkbox.onclick = (e) => e.target.checked ? onChecked(e) : onUnchecked(e);
+                    checkbox.checked = checked;
 
                     _label.innerHTML = label;
                     _label.setAttribute('for', id);
-                    container.appendChild(callback);
+                    container.appendChild(checkbox);
+                    container.appendChild(_label);
+
+                    return container;
+                }
+
+                /**
+                 * returns a input[type=radio] wrapped in a container
+                 * @param   {String}    label
+                 * @param   {String}    id
+                 * @param   {function}  onClick
+                 * @returns {HTMLElement}
+                */
+
+                function RadioButton ({label, id, name, checked = false, onClick = null}) {
+                    let container = document.createElement('span')
+                    let radio = document.createElement('input');
+                    let _label = document.createElement('label');
+
+                    radio.type = 'radio';
+                    radio.id = id;
+                    radio.name = name;
+                    radio.onclick = (e) => onClick(e);
+                    radio.checked = checked;
+
+                    _label.innerHTML = label;
+                    _label.setAttribute('for', id);
+                    container.appendChild(radio);
                     container.appendChild(_label);
 
                     return container;
@@ -112,7 +144,7 @@
                         addKey(userData, 'seconds', (ts) => new Date(ts).getMinutes() * 60 + new Date(ts).getSeconds(), 'timestamp');
                         
                         switch(filter) {
-                            case 'avergeAndScale' : {
+                            case 'averageAndScale' : {
                                 for (let i = 0; i < userData.length; i++) {
                                     let noOfMerge = scale({
                                         data: userData,
@@ -164,16 +196,35 @@
                     checked: true,
                     onChecked: () => updateUsersToRender(user, usersToRender.add.bind(usersToRender)),
                     onUnchecked: () => updateUsersToRender(user, usersToRender.delete.bind(usersToRender))
-                }))
+                }));
 
                 function updateUsersToRender(value, func) {
                     func(value);
-                    renderChart('chart-container', usersToRender, 'quantize', {stepSize: 4});
+                    _renderChart();
                 }
-                
+
+                function setFilter(filterName) {
+                    filter = filterName;
+                    _renderChart();
+                }
+
+                function _renderChart () {
+                    renderChart('chart-container', usersToRender, filter, options);
+                }
+
+                const radioControls = [
+                    RadioButton({label: 'Quantize', id: 'quantize', name: 'filter', onClick: () => setFilter('quantize')}),
+                    RadioButton({label: 'AverageAndScale', name: 'filter', id: 'avgAndScale', onClick: () => setFilter('averageAndScale')}),
+                    RadioButton({label: 'No Filter', name: 'filter', id: 'no-filter', onClick: () => setFilter(null)}),
+                ]
+
                 render(
                     checkBoxes,
                     document.getElementById('users-cb')
+                );
+                render(
+                    radioControls,
+                    document.getElementById('graph-controls')
                 );
                 renderChart('chart-container', usersToRender);
 
@@ -194,12 +245,21 @@
             #users-cb p {
                 margin: 0px 0px 5px 0px;
             }
+            #graph-controls {
+                margin-top: 10px;
+            }
+            #graph-control-title {
+                margin-right: 25px;
+            }
         </style>
     </head>
     <body>
         <div id = 'users-cb'>
             <h3>Participants</h3>
             <p>Below is a list of unique users found in the data</p>
+        </div>
+        <div id = 'graph-controls'>
+            <span id = 'graph-controls-title'>Graph Controls:</span>
         </div>
         <div id = 'chart-container'></div>
     </body>
